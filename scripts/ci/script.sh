@@ -45,6 +45,7 @@ cmake \
     -DLASZIP_INCLUDE_DIR:PATH=/usr/local/include \
     -DLASZIP_LIBRARY:FILEPATH=/usr/local/lib/liblaszip.so \
     -DWITH_TESTS=ON \
+    -DBUILD_PIPELINE_TESTS=ON \
     -G "$PDAL_CMAKE_GENERATOR" \
     ..
 
