@@ -63,8 +63,8 @@ private:
 
     p_ply m_ply;
     PointViewPtr m_pointCollector;
+    int m_precision;
     e_ply_storage_mode m_storageMode;
-
 };
 
 

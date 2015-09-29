@@ -81,6 +81,16 @@ static const char *const ply_type_list[] = {
     "list", NULL
 };     /* order matches e_ply_type enum */
 
+static const char *formats[] = {
+    "%d", "%d", "%d", "%d",
+    "%d", "%d", "%g", "%g",
+    "%d", "%d", "%d", "%d",
+    "%d", "%d", "%g", "%g",
+    NULL, NULL
+    /* order matches e_ply_type enum */
+};
+
+
 /* ----------------------------------------------------------------------
  * Property reading callback argument
  *
@@ -121,6 +131,7 @@ typedef struct t_ply_property_ {
     p_ply_read_cb read_cb;
     void *pdata;
     long idata;
+    char format[WORDSIZE];
 } t_ply_property; 
 
 /* ----------------------------------------------------------------------
@@ -156,7 +167,7 @@ typedef struct t_ply_idriver_ {
 } t_ply_idriver;
 typedef t_ply_idriver *p_ply_idriver;
 
-typedef int (*p_ply_ohandler)(p_ply ply, double value);
+typedef int (*p_ply_ohandler)(p_ply ply, double value, const char *fmt);
 typedef int (*p_ply_ochunk)(p_ply ply, void *anydata, size_t size);
 typedef struct t_ply_odriver_ {
     p_ply_ohandler ohandler[16];
@@ -508,7 +519,15 @@ int ply_add_scalar_property(p_ply ply, const char *name, e_ply_type type) {
     property = ply_grow_property(ply, element);
     if (!property) return 0;
     strcpy(property->name, name);
+    strcpy(property->format, formats[type]);
     property->type = type;
+    return 1;
+}
+
+int ply_set_oformat(p_ply ply, const char *fmt) {
+    p_ply_element element = &ply->element[ply->nelements - 1];
+    p_ply_property property = &element->property[element->nproperties - 1];
+    strcpy(property->format, fmt);
     return 1;
 }
 
@@ -632,7 +651,7 @@ int ply_write(p_ply ply, double value) {
         type = property->type;
         ply->wlength = 0;
     }
-    if (!ply->odriver->ohandler[type](ply, value)) {
+    if (!ply->odriver->ohandler[type](ply, value, property->format)) {
         ply_ferror(ply, "Failed writing %s of %s %d (%s: %s)", 
                     property->name, element->name, 
                     ply->winstance_index, 
@@ -1300,89 +1319,97 @@ static int ply_type_check(void) {
 /* ----------------------------------------------------------------------
  * Output handlers
  * ---------------------------------------------------------------------- */
-static int oascii_int8(p_ply ply, double value) {
+static int oascii_int8(p_ply ply, double value, const char *fmt) {
     if (value > PLY_INT8_MAX || value < PLY_INT8_MIN) return 0;
-    return fprintf(ply->fp, "%d", (t_ply_int8) value) > 0;
+    return fprintf(ply->fp, fmt, (t_ply_int8) value) > 0;
 }
 
-static int oascii_uint8(p_ply ply, double value) {
+static int oascii_uint8(p_ply ply, double value, const char *fmt) {
     if (value > PLY_UINT8_MAX || value < 0) return 0;
-    return fprintf(ply->fp, "%d", (t_ply_uint8) value) > 0;
+    return fprintf(ply->fp, fmt, (t_ply_uint8) value) > 0;
 }
 
-static int oascii_int16(p_ply ply, double value) {
+static int oascii_int16(p_ply ply, double value, const char *fmt) {
     if (value > PLY_INT16_MAX || value < PLY_INT16_MIN) return 0;
-    return fprintf(ply->fp, "%d", (t_ply_int16) value) > 0;
+    return fprintf(ply->fp, fmt, (t_ply_int16) value) > 0;
 }
 
-static int oascii_uint16(p_ply ply, double value) {
+static int oascii_uint16(p_ply ply, double value, const char *fmt) {
     if (value > PLY_UINT16_MAX || value < 0) return 0;
-    return fprintf(ply->fp, "%d", (t_ply_uint16) value) > 0;
+    return fprintf(ply->fp, fmt, (t_ply_uint16) value) > 0;
 }
 
-static int oascii_int32(p_ply ply, double value) {
+static int oascii_int32(p_ply ply, double value, const char *fmt) {
     if (value > PLY_INT32_MAX || value < PLY_INT32_MIN) return 0;
-    return fprintf(ply->fp, "%d", (t_ply_int32) value) > 0;
+    return fprintf(ply->fp, fmt, (t_ply_int32) value) > 0;
 }
 
-static int oascii_uint32(p_ply ply, double value) {
+static int oascii_uint32(p_ply ply, double value, const char *fmt) {
     if (value > PLY_UINT32_MAX || value < 0) return 0;
-    return fprintf(ply->fp, "%d", (t_ply_uint32) value) > 0;
+    return fprintf(ply->fp, fmt, (t_ply_uint32) value) > 0;
 }
 
-static int oascii_float32(p_ply ply, double value) {
+static int oascii_float32(p_ply ply, double value, const char *fmt) {
     if (value < -FLT_MAX || value > FLT_MAX) return 0;
-    return fprintf(ply->fp, "%g", (float) value) > 0;
+    return fprintf(ply->fp, fmt, (float) value) > 0;
 }
 
-static int oascii_float64(p_ply ply, double value) {
+static int oascii_float64(p_ply ply, double value, const char *fmt) {
     if (value < -DBL_MAX || value > DBL_MAX) return 0;
-    return fprintf(ply->fp, "%g", value) > 0;
+    return fprintf(ply->fp, fmt, value) > 0;
 }
 
-static int obinary_int8(p_ply ply, double value) {
+static int obinary_int8(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     t_ply_int8 int8 = (t_ply_int8) value;
     if (value > PLY_INT8_MAX || value < PLY_INT8_MIN) return 0;
     return ply->odriver->ochunk(ply, &int8, sizeof(int8));
 }
 
-static int obinary_uint8(p_ply ply, double value) {
+static int obinary_uint8(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     t_ply_uint8 uint8 = (t_ply_uint8) value;
     if (value > PLY_UINT8_MAX || value < 0) return 0;
     return ply->odriver->ochunk(ply, &uint8, sizeof(uint8)); 
 }
 
-static int obinary_int16(p_ply ply, double value) {
+static int obinary_int16(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     t_ply_int16 int16 = (t_ply_int16) value;
     if (value > PLY_INT16_MAX || value < PLY_INT16_MIN) return 0;
     return ply->odriver->ochunk(ply, &int16, sizeof(int16));
 }
 
-static int obinary_uint16(p_ply ply, double value) {
+static int obinary_uint16(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     t_ply_uint16 uint16 = (t_ply_uint16) value;
     if (value > PLY_UINT16_MAX || value < 0) return 0;
     return ply->odriver->ochunk(ply, &uint16, sizeof(uint16)); 
 }
 
-static int obinary_int32(p_ply ply, double value) {
+static int obinary_int32(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     t_ply_int32 int32 = (t_ply_int32) value;
     if (value > PLY_INT32_MAX || value < PLY_INT32_MIN) return 0;
     return ply->odriver->ochunk(ply, &int32, sizeof(int32));
 }
 
-static int obinary_uint32(p_ply ply, double value) {
+static int obinary_uint32(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     t_ply_uint32 uint32 = (t_ply_uint32) value;
     if (value > PLY_UINT32_MAX || value < 0) return 0;
     return ply->odriver->ochunk(ply, &uint32, sizeof(uint32));
 }
 
-static int obinary_float32(p_ply ply, double value) {
+static int obinary_float32(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     float float32 = (float) value;
     if (value > FLT_MAX || value < -FLT_MAX) return 0;
     return ply->odriver->ochunk(ply, &float32, sizeof(float32));
 }
 
-static int obinary_float64(p_ply ply, double value) {
+static int obinary_float64(p_ply ply, double value, const char *fmt) {
+    (void)fmt;
     return ply->odriver->ochunk(ply, &value, sizeof(value)); 
 }
 

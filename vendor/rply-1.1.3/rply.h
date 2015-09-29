@@ -295,6 +295,17 @@ int ply_add_list_property(p_ply ply, const char *name,
 int ply_add_scalar_property(p_ply ply, const char *name, e_ply_type type);
 
 /* ----------------------------------------------------------------------
+ * Set a "printf"-style format string for ASCII output of the current property.
+ * Call immediately following ply_add_property() or ply_add_scalar_property().
+ *
+ * ply: handle returned by ply_create
+ * fmt: "printf"-style format string
+ *
+ * Returns 1 if successfull, 0 otherwise
+ * ---------------------------------------------------------------------- */
+int ply_set_oformat(p_ply ply, const char *fmt);
+
+/* ----------------------------------------------------------------------
  * Adds a new comment item 
  *
  * ply: handle returned by ply_create

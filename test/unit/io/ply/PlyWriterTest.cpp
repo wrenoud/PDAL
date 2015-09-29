@@ -35,6 +35,8 @@
 #include <pdal/pdal_test_main.hpp>
 
 #include <FauxReader.hpp>
+#include <LasReader.hpp>
+#include <PlyReader.hpp>
 #include <PlyWriter.hpp>
 #include <pdal/StageFactory.hpp>
 #include "Support.hpp"
@@ -43,8 +45,7 @@
 namespace pdal
 {
 
-
-TEST(PlyWriter, Constructor)
+TEST(PlyWriter, constructor)
 {
     PlyWriter writer1;
 
@@ -54,7 +55,7 @@ TEST(PlyWriter, Constructor)
 }
 
 
-TEST(PlyWriter, Write)
+TEST(PlyWriter, write)
 {
     Options readerOptions;
     readerOptions.add("count", 750);
@@ -73,5 +74,86 @@ TEST(PlyWriter, Write)
     writer.execute(table);
 }
 
+void readWrite(const std::string storageMode)
+{
+    std::string input(Support::datapath("las/mvk-thin.las"));
+    std::string output(Support::temppath("out.ply"));
 
+    Options ro;
+    ro.add("filename", input);
+
+    LasReader reader;
+    reader.setOptions(ro);
+
+    Options wo;
+    wo.add("filename", output);
+    wo.add("storage_mode", storageMode);
+    wo.add("precision", 15);
+
+    PlyWriter writer;
+    writer.setOptions(wo);
+    writer.setInput(reader);
+
+    FileUtils::deleteFile(output);
+    PointTable table;
+    writer.prepare(table);
+    writer.execute(table);
+
+    Options o1;
+    o1.add("filename", input);
+
+    LasReader r1;
+    r1.setOptions(o1);
+
+    PointTable t1;
+    r1.prepare(t1);
+    PointViewSet s1 = r1.execute(t1);
+
+    Options o2;
+    o2.add("filename", output);
+
+    PlyReader r2;
+    r2.setOptions(o2);
+
+    PointTable t2;
+    r2.prepare(t2);
+    PointViewSet s2 = r2.execute(t2);
+
+    EXPECT_EQ(s1.size(), 1u);
+    EXPECT_EQ(s2.size(), 1u);
+    PointViewPtr v1 = *s1.begin();
+    PointViewPtr v2 = *s2.begin();
+    EXPECT_EQ(v1->size(), 6280u);
+    EXPECT_EQ(v1->size(), v2->size());
+    for (PointId i = 0; i < v1->size(); i++)
+    {
+        EXPECT_DOUBLE_EQ(v1->getFieldAs<double>(Dimension::Id::X, i),
+            v2->getFieldAs<double>(Dimension::Id::X, i));
+        EXPECT_DOUBLE_EQ(v1->getFieldAs<double>(Dimension::Id::Y, i),
+            v2->getFieldAs<double>(Dimension::Id::Y, i));
+        EXPECT_DOUBLE_EQ(v1->getFieldAs<double>(Dimension::Id::Z, i),
+            v2->getFieldAs<double>(Dimension::Id::Z, i));
+    }
 }
+
+TEST(PlyWriter, readWriteLittle)
+{
+    readWrite("little endian");
+}
+
+TEST(PlyWriter, readWriteBig)
+{
+    readWrite("big endian");
+}
+
+TEST(PlyWriter, readWriteAscii)
+{
+    readWrite("ascii");
+}
+
+TEST(PlyWriter, readWriteDefault)
+{
+    readWrite("default");
+}
+
+} // namespace pdal
