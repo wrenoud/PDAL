@@ -1382,50 +1382,50 @@ static int oascii_float64(p_ply ply, double value, const char *fmt) {
 }
 
 static int obinary_int8(p_ply ply, double value, const char *fmt) {
-//    (void)fmt;
     t_ply_int8 int8 = (t_ply_int8) value;
+    (void)fmt;
     if (value > PLY_INT8_MAX || value < PLY_INT8_MIN) return 0;
     return ply->odriver->ochunk(ply, &int8, sizeof(int8));
 }
 
 static int obinary_uint8(p_ply ply, double value, const char *fmt) {
-    (void)fmt;
     t_ply_uint8 uint8 = (t_ply_uint8) value;
+    (void)fmt;
     if (value > PLY_UINT8_MAX || value < 0) return 0;
     return ply->odriver->ochunk(ply, &uint8, sizeof(uint8));
 }
 
 static int obinary_int16(p_ply ply, double value, const char *fmt) {
-    (void)fmt;
     t_ply_int16 int16 = (t_ply_int16) value;
+    (void)fmt;
     if (value > PLY_INT16_MAX || value < PLY_INT16_MIN) return 0;
     return ply->odriver->ochunk(ply, &int16, sizeof(int16));
 }
 
 static int obinary_uint16(p_ply ply, double value, const char *fmt) {
-    (void)fmt;
     t_ply_uint16 uint16 = (t_ply_uint16) value;
+    (void)fmt;
     if (value > PLY_UINT16_MAX || value < 0) return 0;
     return ply->odriver->ochunk(ply, &uint16, sizeof(uint16));
 }
 
 static int obinary_int32(p_ply ply, double value, const char *fmt) {
-    (void)fmt;
     t_ply_int32 int32 = (t_ply_int32) value;
+    (void)fmt;
     if (value > PLY_INT32_MAX || value < PLY_INT32_MIN) return 0;
     return ply->odriver->ochunk(ply, &int32, sizeof(int32));
 }
 
 static int obinary_uint32(p_ply ply, double value, const char *fmt) {
-    (void)fmt;
     t_ply_uint32 uint32 = (t_ply_uint32) value;
+    (void)fmt;
     if (value > PLY_UINT32_MAX || value < 0) return 0;
     return ply->odriver->ochunk(ply, &uint32, sizeof(uint32));
 }
 
 static int obinary_float32(p_ply ply, double value, const char *fmt) {
-    (void)fmt;
     float float32 = (float) value;
+    (void)fmt;
     if (value > FLT_MAX || value < -FLT_MAX) return 0;
     return ply->odriver->ochunk(ply, &float32, sizeof(float32));
 }
