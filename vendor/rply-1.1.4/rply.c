@@ -1382,7 +1382,7 @@ static int oascii_float64(p_ply ply, double value, const char *fmt) {
 }
 
 static int obinary_int8(p_ply ply, double value, const char *fmt) {
-    (void)fmt;
+//    (void)fmt;
     t_ply_int8 int8 = (t_ply_int8) value;
     if (value > PLY_INT8_MAX || value < PLY_INT8_MIN) return 0;
     return ply->odriver->ochunk(ply, &int8, sizeof(int8));
