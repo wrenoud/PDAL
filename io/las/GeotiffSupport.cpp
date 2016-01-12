@@ -35,13 +35,14 @@
 #include "GeotiffSupport.hpp"
 
 // GDAL
+#include <geo_simpletags.h>
 #include <geo_normalize.h>
 #include <ogr_spatialref.h>
+#include <cpl_conv.h>
 
 #include <sstream>
 
 PDAL_C_START
-#ifdef __geotiff_h_
 
 // These functions are available from GDAL, but they
 // aren't exported.

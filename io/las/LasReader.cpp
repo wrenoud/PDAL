@@ -583,7 +583,6 @@ void LasReader::addDimensions(PointLayoutPtr layout)
     if (m_lasHeader.versionAtLeast(1, 4))
     {
         layout->registerDim(Id::ScanChannel);
-        layout->registerDim(Id::ClassFlags);
     }
 
     for (auto& dim : m_extraDims)
