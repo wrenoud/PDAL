@@ -188,6 +188,15 @@ static double computeArea(const std::string& wkt)
 }
 #else
 
+namespace Geometry
+{
+
+static double computeArea(const std::string& wkt)
+{
+    return 0.0;
+}
+
+{
 static std::string smoothPolygon(const std::string& wkt, double tolerance)
 {
     throw pdal_error("Can't call smoothPolygon.  PDAL not built with GEOS.");
