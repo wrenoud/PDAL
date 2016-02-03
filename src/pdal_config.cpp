@@ -66,9 +66,7 @@
 #include <laszip/laszip.hpp>
 #endif
 
-#ifdef PDAL_HAVE_GEOS
-#include <geos/version.h>
-#endif
+#include <geos_c.h>
 
 #ifdef PDAL_HAVE_HEXER
 #include <hexer/hexer.hpp>
