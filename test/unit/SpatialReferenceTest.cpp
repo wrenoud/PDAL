@@ -75,8 +75,15 @@ TEST(SpatialReferenceTest, test_proj4_roundtrip)
     std::string proj4 = "+proj=utm +zone=15 +datum=WGS84 +units=m +no_defs";
     std::string proj4_ellps =
         "+proj=utm +zone=15 +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+
+#if GDAL_VERSION_MAJOR <=1
     std::string proj4_out =
-        "+proj=utm +zone=15 +datum=WGS84 +units=m +no_defs";
+        "+proj=utm +zone=15 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m "
+        "+no_defs";
+#else
+    std::string proj4_out = "+proj=utm +zone=15 +datum=WGS84 +units=m +no_defs";
+
+#endif
 
     {
         SpatialReference ref;
