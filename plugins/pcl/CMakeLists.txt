@@ -171,6 +171,14 @@ PDAL_ADD_PLUGIN(height_filter_libname filter height
     FILES filters/HeightFilter.cpp
     LINK_WITH ${PCL_LIBRARIES})
 
+PDAL_ADD_PLUGIN(lownoise_filter_libname filter lownoise
+    FILES filters/LowNoiseFilter.cpp
+    LINK_WITH ${PCL_LIBRARIES})
+
+PDAL_ADD_PLUGIN(lownoise2_filter_libname filter lownoise2
+    FILES filters/LowNoiseFilter2.cpp
+    LINK_WITH ${PCL_LIBRARIES})
+
 PDAL_ADD_PLUGIN(dartsample_filter_libname filter dartsample
     FILES
         filters/DartSampleFilter.cpp
