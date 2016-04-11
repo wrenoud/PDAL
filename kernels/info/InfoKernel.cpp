@@ -213,7 +213,7 @@ MetadataNode InfoKernel::dumpPoints(PointViewPtr inView) const
             outView->appendPoint(*inView.get(), id);
     }
 
-    MetadataNode tree = Utils::toMetadata(outView);
+    MetadataNode tree = outView->toMetadata();
     std::string prefix("point ");
     for (size_t i = 0; i < outView->size(); ++i)
     {
@@ -230,7 +230,7 @@ MetadataNode InfoKernel::dumpSummary(const QuickInfo& qi)
     MetadataNode summary;
     summary.add("num_points", qi.m_pointCount);
     summary.add("spatial_reference", qi.m_srs.getWKT());
-    MetadataNode srs = pdal::Utils::toMetadata(qi.m_srs);
+    MetadataNode srs = qi.m_srs.toMetadata();
     summary.add(srs);
     MetadataNode bounds = summary.add("bounds");
     MetadataNode x = bounds.add("X");
@@ -357,7 +357,7 @@ MetadataNode InfoKernel::run(const std::string& filename)
 void InfoKernel::dump(MetadataNode& root)
 {
     if (m_showSchema)
-        root.add(Utils::toMetadata(m_manager->pointTable()).clone("schema"));
+        root.add(m_manager->pointTable().toMetadata().clone("schema"));
 
     if (m_PointCloudSchemaOutput.size() > 0)
     {
@@ -471,7 +471,7 @@ MetadataNode InfoKernel::dumpQuery(PointViewPtr inView) const
     for (auto i = ids.begin(); i != ids.end(); ++i)
         outView->appendPoint(*inView.get(), *i);
 
-    return Utils::toMetadata(outView);
+    return outView->toMetadata();
 }
 
 
