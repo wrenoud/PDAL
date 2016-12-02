@@ -1,4 +1,4 @@
-
+add_subdirectory(and)
 add_subdirectory(delta)
 add_subdirectory(diff)
 add_subdirectory(hausdorff)

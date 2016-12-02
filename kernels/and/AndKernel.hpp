@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2014, Bradley J Chambers (brad.chambers@gmail.com)
+* Copyright (c) 2016, Bradley J Chambers (brad.chambers@gmail.com)
 *
 * All rights reserved.
 *
@@ -32,42 +32,36 @@
 * OF SUCH DAMAGE.
 ****************************************************************************/
 
-#include <pdal/KernelFactory.hpp>
-#include <pdal/PluginManager.hpp>
+#pragma once
 
-#include <../kernels/and/AndKernel.hpp>
-#include <../kernels/delta/DeltaKernel.hpp>
-#include <../kernels/diff/DiffKernel.hpp>
-#include <../kernels/hausdorff/HausdorffKernel.hpp>
-#include <../kernels/info/InfoKernel.hpp>
-#include <../kernels/merge/MergeKernel.hpp>
-#include <../kernels/pipeline/PipelineKernel.hpp>
-#include <../kernels/random/RandomKernel.hpp>
-#include <../kernels/sort/SortKernel.hpp>
-#include <../kernels/split/SplitKernel.hpp>
-#include <../kernels/tindex/TIndexKernel.hpp>
-#include <../kernels/translate/TranslateKernel.hpp>
+#include <pdal/Kernel.hpp>
+#include <pdal/plugin.hpp>
+
+extern "C" int32_t AndKernel_ExitFunc();
+extern "C" PF_ExitFunc AndKernel_InitPlugin();
 
 namespace pdal
 {
 
-KernelFactory::KernelFactory(bool no_plugins)
+class PDAL_DLL AndKernel : public Kernel
 {
-    if (!no_plugins)
-        PluginManager::loadAll(PF_PluginType_Kernel);
+public:
+    static void *create();
+    static int32_t destroy(void *);
+    std::string getName() const;
+    int execute();
 
-    PluginManager::initializePlugin(AndKernel_InitPlugin);
-    PluginManager::initializePlugin(DeltaKernel_InitPlugin);
-    PluginManager::initializePlugin(DiffKernel_InitPlugin);
-    PluginManager::initializePlugin(HausdorffKernel_InitPlugin);
-    PluginManager::initializePlugin(InfoKernel_InitPlugin);
-    PluginManager::initializePlugin(MergeKernel_InitPlugin);
-    PluginManager::initializePlugin(PipelineKernel_InitPlugin);
-    PluginManager::initializePlugin(RandomKernel_InitPlugin);
-    PluginManager::initializePlugin(SortKernel_InitPlugin);
-    PluginManager::initializePlugin(SplitKernel_InitPlugin);
-    PluginManager::initializePlugin(TIndexKernel_InitPlugin);
-    PluginManager::initializePlugin(TranslateKernel_InitPlugin);
-}
+private:
+    AndKernel()
+    {}
+      
+    void addSwitches(ProgramArgs& args);
+
+    std::string m_fullFile;
+    std::string m_sampFile;
+    std::string m_outputFile;
+    double m_tolerance;
+    std::string m_dimName;
+};
 
 } // namespace pdal
