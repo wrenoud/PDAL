@@ -121,7 +121,13 @@ Dimension::Id PointLayout::registerOrAssignDim(const std::string name,
         registerDim(id, type);
         return id;
     }
-    return assignDim(name, type);
+
+    id = assignDim(name, type);
+
+    if (id != Dimension::Id::Unknown)
+        return id;
+    else
+        return findDim(name);
 }
 
 
