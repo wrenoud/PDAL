@@ -129,46 +129,46 @@ public:
         PointId idx, const void *val);
 
     template <typename T>
-    bool compare(Dimension::Id dim, PointId id1, PointId id2)
+    bool compare(const Dimension::Detail& detail, PointId id1, PointId id2)
     {
-        return (getFieldInternal<T>(dim, id1) < getFieldInternal<T>(dim, id2));
+        return (getFieldInternal<T>(detail, id1) < getFieldInternal<T>(detail, id2));
     }
 
     bool compare(Dimension::Id dim, PointId id1, PointId id2)
     {
-        const Dimension::Detail *dd = layout()->dimDetail(dim);
+        const Dimension::Detail& detail = *layout()->dimDetail(dim);
 
-        switch (dd->type())
+        switch (detail.type())
         {
             case Dimension::Type::Float:
-                return compare<float>(dim, id1, id2);
+                return compare<float>(detail, id1, id2);
                 break;
             case Dimension::Type::Double:
-                return compare<double>(dim, id1, id2);
+                return compare<double>(detail, id1, id2);
                 break;
             case Dimension::Type::Signed8:
-                return compare<int8_t>(dim, id1, id2);
+                return compare<int8_t>(detail, id1, id2);
                 break;
             case Dimension::Type::Signed16:
-                return compare<int16_t>(dim, id1, id2);
+                return compare<int16_t>(detail, id1, id2);
                 break;
             case Dimension::Type::Signed32:
-                return compare<int32_t>(dim, id1, id2);
+                return compare<int32_t>(detail, id1, id2);
                 break;
             case Dimension::Type::Signed64:
-                return compare<int64_t>(dim, id1, id2);
+                return compare<int64_t>(detail, id1, id2);
                 break;
             case Dimension::Type::Unsigned8:
-                return compare<uint8_t>(dim, id1, id2);
+                return compare<uint8_t>(detail, id1, id2);
                 break;
             case Dimension::Type::Unsigned16:
-                return compare<uint16_t>(dim, id1, id2);
+                return compare<uint16_t>(detail, id1, id2);
                 break;
             case Dimension::Type::Unsigned32:
-                return compare<uint32_t>(dim, id1, id2);
+                return compare<uint32_t>(detail, id1, id2);
                 break;
             case Dimension::Type::Unsigned64:
-                return compare<uint64_t>(dim, id1, id2);
+                return compare<uint64_t>(detail, id1, id2);
                 break;
             case Dimension::Type::None:
             default:
@@ -177,9 +177,9 @@ public:
         }
     }
 
-    void getRawField(Dimension::Id dim, PointId idx, void *buf) const
+    void getRawField(const Dimension::Detail& detail, PointId idx, void *buf) const
     {
-        getFieldInternal(dim, idx, buf);
+        getFieldInternal(detail, idx, buf);
     }
 
     /*! @return a cumulated bounds of all points in the PointView.
@@ -312,16 +312,17 @@ private:
     static int m_lastId;
 
     template<typename T_IN, typename T_OUT>
-    bool convertAndSet(Dimension::Id dim, PointId idx, T_IN in);
+    bool convertAndSet(const Dimension::Detail& detail, PointId idx, T_IN in);
 
-    virtual void setFieldInternal(Dimension::Id dim, PointId idx,
-        const void *buf);
-    virtual void getFieldInternal(Dimension::Id dim, PointId idx,
-        void *buf) const
-    { m_pointTable.getFieldInternal(dim, m_index[idx], buf); }
+    void setFieldInternal(const Dimension::Detail& detail, PointId idx,
+        const void *buf) override;
+
+    void getFieldInternal(const Dimension::Detail& detail, PointId idx,
+        void *buf) const override
+    { m_pointTable.getFieldInternal(detail, m_index[idx], buf); }
 
     template<class T>
-    T getFieldInternal(Dimension::Id dim, PointId pointIndex) const;
+    T getFieldInternal(const Dimension::Detail& detail, PointId pointIndex) const;
     inline PointId getTemp(PointId id);
     void freeTemp(PointId id)
         { m_temps.push(id); }
@@ -340,11 +341,11 @@ struct PointViewLess
 };
 
 template <class T>
-T PointView::getFieldInternal(Dimension::Id dim, PointId id) const
+T PointView::getFieldInternal(const Dimension::Detail& detail, PointId id) const
 {
     T t;
 
-    getFieldInternal(dim, id, &t);
+    getFieldInternal(detail, id, &t);
     return t;
 }
 
@@ -441,49 +442,49 @@ inline T PointView::getFieldAs(Dimension::Id dim,
     assert(pointIndex < m_size);
     T retval;
     bool ok = false;
-    const Dimension::Detail *dd = layout()->dimDetail(dim);
+    const Dimension::Detail& detail = *layout()->dimDetail(dim);
     Everything e;
 
-    switch (dd->type())
+    switch (detail.type())
     {
     case Dimension::Type::Float:
-        e.f = getFieldInternal<float>(dim, pointIndex);
+        e.f = getFieldInternal<float>(detail, pointIndex);
         ok = Utils::numericCast(e.f, retval);
         break;
     case Dimension::Type::Double:
-        e.d = getFieldInternal<double>(dim, pointIndex);
+        e.d = getFieldInternal<double>(detail, pointIndex);
         ok = Utils::numericCast(e.d, retval);
         break;
     case Dimension::Type::Signed8:
-        e.s8 = getFieldInternal<int8_t>(dim, pointIndex);
+        e.s8 = getFieldInternal<int8_t>(detail, pointIndex);
         ok = Utils::numericCast(e.s8, retval);
         break;
     case Dimension::Type::Signed16:
-        e.s16 = getFieldInternal<int16_t>(dim, pointIndex);
+        e.s16 = getFieldInternal<int16_t>(detail, pointIndex);
         ok = Utils::numericCast(e.s16, retval);
         break;
     case Dimension::Type::Signed32:
-        e.s32 = getFieldInternal<int32_t>(dim, pointIndex);
+        e.s32 = getFieldInternal<int32_t>(detail, pointIndex);
         ok = Utils::numericCast(e.s32, retval);
         break;
     case Dimension::Type::Signed64:
-        e.s64 = getFieldInternal<int64_t>(dim, pointIndex);
+        e.s64 = getFieldInternal<int64_t>(detail, pointIndex);
         ok = Utils::numericCast(e.s64, retval);
         break;
     case Dimension::Type::Unsigned8:
-        e.u8 = getFieldInternal<uint8_t>(dim, pointIndex);
+        e.u8 = getFieldInternal<uint8_t>(detail, pointIndex);
         ok = Utils::numericCast(e.u8, retval);
         break;
     case Dimension::Type::Unsigned16:
-        e.u16 = getFieldInternal<uint16_t>(dim, pointIndex);
+        e.u16 = getFieldInternal<uint16_t>(detail, pointIndex);
         ok = Utils::numericCast(e.u16, retval);
         break;
     case Dimension::Type::Unsigned32:
-        e.u32 = getFieldInternal<uint32_t>(dim, pointIndex);
+        e.u32 = getFieldInternal<uint32_t>(detail, pointIndex);
         ok = Utils::numericCast(e.u32, retval);
         break;
     case Dimension::Type::Unsigned64:
-        e.u64 = getFieldInternal<uint64_t>(dim, pointIndex);
+        e.u64 = getFieldInternal<uint64_t>(detail, pointIndex);
         ok = Utils::numericCast(e.u64, retval);
         break;
     case Dimension::Type::None:
@@ -498,8 +499,8 @@ inline T PointView::getFieldAs(Dimension::Id dim,
         std::ostringstream oss;
         oss << "Unable to fetch data and convert as requested: ";
         oss << Dimension::name(dim) << ":" <<
-            Dimension::interpretationName(dd->type()) <<
-            "(" << Utils::toDouble(e, dd->type()) << ") -> " <<
+            Dimension::interpretationName(detail.type()) <<
+            "(" << Utils::toDouble(e, detail.type()) << ") -> " <<
             Utils::typeidName<T>();
         throw pdal_error(oss.str());
     }
@@ -509,13 +510,13 @@ inline T PointView::getFieldAs(Dimension::Id dim,
 
 
 template<typename T_IN, typename T_OUT>
-bool PointView::convertAndSet(Dimension::Id dim, PointId idx, T_IN in)
+bool PointView::convertAndSet(const Dimension::Detail& detail, PointId idx, T_IN in)
 {
     T_OUT out;
 
     bool success = Utils::numericCast(in, out);
     if (success)
-        setFieldInternal(dim, idx, &out);
+        setFieldInternal(detail, idx, &out);
     return success;
 }
 
@@ -523,40 +524,40 @@ bool PointView::convertAndSet(Dimension::Id dim, PointId idx, T_IN in)
 template<typename T>
 void PointView::setField(Dimension::Id dim, PointId idx, T val)
 {
-    const Dimension::Detail *dd = layout()->dimDetail(dim);
+    const Dimension::Detail& detail = *layout()->dimDetail(dim);
 
     bool ok = true;
-    switch (dd->type())
+    switch (detail.type())
     {
     case Dimension::Type::Float:
-        ok = convertAndSet<T, float>(dim, idx, val);
+        ok = convertAndSet<T, float>(detail, idx, val);
         break;
     case Dimension::Type::Double:
-        ok = convertAndSet<T, double>(dim, idx, val);
+        ok = convertAndSet<T, double>(detail, idx, val);
         break;
     case Dimension::Type::Signed8:
-        ok = convertAndSet<T, int8_t>(dim, idx, val);
+        ok = convertAndSet<T, int8_t>(detail, idx, val);
         break;
     case Dimension::Type::Signed16:
-        ok = convertAndSet<T, int16_t>(dim, idx, val);
+        ok = convertAndSet<T, int16_t>(detail, idx, val);
         break;
     case Dimension::Type::Signed32:
-        ok = convertAndSet<T, int32_t>(dim, idx, val);
+        ok = convertAndSet<T, int32_t>(detail, idx, val);
         break;
     case Dimension::Type::Signed64:
-        ok = convertAndSet<T, int64_t>(dim, idx, val);
+        ok = convertAndSet<T, int64_t>(detail, idx, val);
         break;
     case Dimension::Type::Unsigned8:
-        ok = convertAndSet<T, uint8_t>(dim, idx, val);
+        ok = convertAndSet<T, uint8_t>(detail, idx, val);
         break;
     case Dimension::Type::Unsigned16:
-        ok = convertAndSet<T, uint16_t>(dim, idx, val);
+        ok = convertAndSet<T, uint16_t>(detail, idx, val);
         break;
     case Dimension::Type::Unsigned32:
-        ok = convertAndSet<T, uint32_t>(dim, idx, val);
+        ok = convertAndSet<T, uint32_t>(detail, idx, val);
         break;
     case Dimension::Type::Unsigned64:
-        ok = convertAndSet<T, uint64_t>(dim, idx, val);
+        ok = convertAndSet<T, uint64_t>(detail, idx, val);
         break;
     case Dimension::Type::None:
         val = 0;
@@ -568,7 +569,7 @@ void PointView::setField(Dimension::Id dim, PointId idx, T val)
         oss << "Unable to set data and convert as requested: ";
         oss << Dimension::name(dim) << ":" << Utils::typeidName<T>() <<
             "(" << (double)val << ") -> " <<
-            Dimension::interpretationName(dd->type());
+            Dimension::interpretationName(detail.type());
         throw pdal_error(oss.str());
     }
 }

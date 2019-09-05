@@ -405,17 +405,17 @@ void Invocation::begin(PointView& view, MetadataNode m)
     for (auto di = dims.begin(); di != dims.end(); ++di)
     {
         Dimension::Id d = *di;
-        const Dimension::Detail *dd = layout->dimDetail(d);
-        void *data = malloc(dd->size() * view.size());
+        const Dimension::Detail& detail = *layout->dimDetail(d);
+        void *data = malloc(detail.size() * view.size());
         m_buffers.push_back(data);  // Hold pointer for deallocation
         char *p = (char *)data;
         for (PointId idx = 0; idx < view.size(); ++idx)
         {
-            view.getFieldInternal(d, idx, (void *)p);
-            p += dd->size();
+            view.getFieldInternal(detail, idx, (void *)p);
+            p += detail.size();
         }
         std::string name = layout->dimName(*di);
-        insertArgument(name, (uint8_t *)data, dd->type(), view.size());
+        insertArgument(name, (uint8_t *)data, detail.type(), view.size());
     }
 
     // Put pipeline 'metadata' variable into module scope

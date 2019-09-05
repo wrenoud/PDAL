@@ -123,19 +123,19 @@ protected:
         { return m_layoutRef.pointSize() * numPts; }
 
 private:
-    virtual void setFieldInternal(Dimension::Id id, PointId idx,
-        const void *value);
-    virtual void getFieldInternal(Dimension::Id id, PointId idx,
-        void *value) const;
+    void setFieldInternal(const Dimension::Detail& detail, PointId idx,
+        const void *value) override;
+    void getFieldInternal(const Dimension::Detail& detail, PointId idx,
+        void *value) const override;
 
     // The number of points in each memory block.
-    char *getDimension(const Dimension::Detail *d, PointId idx)
-        { return getPoint(idx) + d->offset(); }
+    char *getDimension(const Dimension::Detail& detail, PointId idx)
+        { return getPoint(idx) + detail.offset(); }
 
-    const char *getDimension(const Dimension::Detail *d, PointId idx) const
+    const char *getDimension(const Dimension::Detail& detail, PointId idx) const
     {
         SimplePointTable *ncThis = const_cast<SimplePointTable *>(this);
-        return ncThis->getPoint(idx) + d->offset();
+        return ncThis->getPoint(idx) + detail.offset();
     }
 };
 

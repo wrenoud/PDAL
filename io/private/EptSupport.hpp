@@ -333,33 +333,31 @@ protected:
     }
 
     // Identical to SimplePointTable's implementation.
-    void setFieldInternal(Dimension::Id id, PointId idx, const void* value)
-        override
+    void setFieldInternal(const Dimension::Detail& detail, PointId idx,
+                          const void* value) override
     {
-        const Dimension::Detail* d = layout()->dimDetail(id);
-        const char* src  = (const char*)value;
-        char* dst = getDimension(d, idx);
-        std::copy(src, src + d->size(), dst);
+        const char* src = (const char*)value;
+        char* dst = getDimension(detail, idx);
+        std::copy(src, src + detail.size(), dst);
     }
 
-    void getFieldInternal(Dimension::Id id, PointId idx, void* value) const
-        override
+    void getFieldInternal(const Dimension::Detail& detail, PointId idx,
+                          void* value) const override
     {
-        const Dimension::Detail* d = layout()->dimDetail(id);
-        const char* src = getDimension(d, idx);
+        const char* src = getDimension(detail, idx);
         char* dst = (char*)value;
-        std::copy(src, src + d->size(), dst);
+        std::copy(src, src + detail.size(), dst);
     }
 
-    char *getDimension(const Dimension::Detail* d, PointId idx)
+    char *getDimension(const Dimension::Detail& detail, PointId idx)
     {
-        return getPoint(idx) + d->offset();
+        return getPoint(idx) + detail.offset();
     }
 
-    const char *getDimension(const Dimension::Detail* d, PointId idx) const
+    const char *getDimension(const Dimension::Detail& detail, PointId idx) const
     {
         ShallowPointTable* ncThis = const_cast<ShallowPointTable*>(this);
-        return ncThis->getPoint(idx) + d->offset();
+        return ncThis->getPoint(idx) + detail.offset();
     }
 
     char* m_data;

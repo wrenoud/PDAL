@@ -74,7 +74,7 @@ PointViewIter PointView::end()
 }
 
 
-void PointView::setFieldInternal(Dimension::Id dim, PointId idx,
+void PointView::setFieldInternal(const Dimension::Detail& detail, PointId idx,
     const void *buf)
 {
     PointId rawId = 0;
@@ -95,9 +95,8 @@ void PointView::setFieldInternal(Dimension::Id dim, PointId idx,
     {
         rawId = m_index[idx];
     }
-    m_pointTable.setFieldInternal(dim, rawId, buf);
+    m_pointTable.setFieldInternal(detail, rawId, buf);
 }
-
 
 void PointView::calculateBounds(BOX2D& output) const
 {
@@ -204,60 +203,60 @@ void PointView::dump(std::ostream& ostr) const
         for (auto di = dims.begin(); di != dims.end(); ++di)
         {
             Dimension::Id d = *di;
-            const Dimension::Detail *dd = layout->dimDetail(d);
+            const Dimension::Detail& detail = *layout->dimDetail(d);
             ostr << layout->dimName(d) << " (" <<
-                Dimension::interpretationName(dd->type()) << ") : ";
+                Dimension::interpretationName(detail.type()) << ") : ";
 
-            switch (dd->type())
+            switch (detail.type())
             {
             case Dimension::Type::Signed8:
                 {
-                    ostr << (int)(getFieldInternal<int8_t>(d, idx));
+                    ostr << (int)(getFieldInternal<int8_t>(detail, idx));
                     break;
                 }
             case Dimension::Type::Signed16:
                 {
-                    ostr << getFieldInternal<int16_t>(d, idx);
+                    ostr << getFieldInternal<int16_t>(detail, idx);
                     break;
                 }
             case Dimension::Type::Signed32:
                 {
-                    ostr << getFieldInternal<int32_t>(d, idx);
+                    ostr << getFieldInternal<int32_t>(detail, idx);
                     break;
                 }
             case Dimension::Type::Signed64:
                 {
-                    ostr << getFieldInternal<int64_t>(d, idx);
+                    ostr << getFieldInternal<int64_t>(detail, idx);
                     break;
                 }
             case Dimension::Type::Unsigned8:
                 {
-                    ostr << (unsigned)(getFieldInternal<uint8_t>(d, idx));
+                    ostr << (unsigned)(getFieldInternal<uint8_t>(detail, idx));
                     break;
                 }
             case Dimension::Type::Unsigned16:
                 {
-                    ostr << getFieldInternal<uint16_t>(d, idx);
+                    ostr << getFieldInternal<uint16_t>(detail, idx);
                     break;
                 }
             case Dimension::Type::Unsigned32:
                 {
-                    ostr << getFieldInternal<uint32_t>(d, idx);
+                    ostr << getFieldInternal<uint32_t>(detail, idx);
                     break;
                 }
             case Dimension::Type::Unsigned64:
                 {
-                    ostr << getFieldInternal<uint64_t>(d, idx);
+                    ostr << getFieldInternal<uint64_t>(detail, idx);
                     break;
                 }
             case Dimension::Type::Float:
                 {
-                    ostr << getFieldInternal<float>(d, idx);
+                    ostr << getFieldInternal<float>(detail, idx);
                     break;
                 }
             case Dimension::Type::Double:
                 {
-                    ostr << getFieldInternal<double>(d, idx);
+                    ostr << getFieldInternal<double>(detail, idx);
                     break;
                 }
             case Dimension::Type::None:

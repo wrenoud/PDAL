@@ -73,10 +73,10 @@ public:
         T val(0);
         bool success = true;
         Everything e;
-        Dimension::Type type = m_layout.dimDetail(dim)->type();
+        const auto& detail = *m_layout.dimDetail(dim);
 
-        m_container.getFieldInternal(dim, m_idx, &e);
-        switch (type)
+        m_container.getFieldInternal(detail, m_idx, &e);
+        switch (detail.type())
         {
         case Dimension::Type::Unsigned8:
             success = Utils::numericCast(e.u8, val);
@@ -117,8 +117,8 @@ public:
             std::ostringstream oss;
             oss << "Unable to fetch data and convert as requested: ";
             oss << Dimension::name(dim) << ":" <<
-                Dimension::interpretationName(type) <<
-                "(" << Utils::toDouble(e, type) << ") -> " <<
+                Dimension::interpretationName(detail.type()) <<
+                "(" << Utils::toDouble(e, detail.type()) << ") -> " <<
                 Utils::typeidName<T>();
             throw pdal_error(oss.str());
         }
@@ -134,11 +134,11 @@ public:
     template<typename T>
     void setField(Dimension::Id dim, T val)
     {
-        Dimension::Type type = m_layout.dimDetail(dim)->type();
+        const auto& detail = *m_layout.dimDetail(dim);
         Everything e;
         bool success = false;
 
-        switch (type)
+        switch (detail.type())
         {
         case Dimension::Type::Unsigned8:
             success = Utils::numericCast(val, e.u8);
@@ -174,7 +174,7 @@ public:
             break;
         }
         if (success)
-            m_container.setFieldInternal(dim, m_idx, &e);
+            m_container.setFieldInternal(detail, m_idx, &e);
     }
 
     /**

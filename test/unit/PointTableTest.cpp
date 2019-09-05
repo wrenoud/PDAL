@@ -119,24 +119,24 @@ TEST(PointTable, userView)
             { return 0; }
         char *getPoint(PointId idx)
             { return NULL; }
-        void setFieldInternal(Dimension::Id id, PointId idx,
-            const void *value)
+        void setFieldInternal(const Dimension::Detail& detail, PointId idx,
+            const void *value) override
         {
-            if (id == Dimension::Id::X)
+            if (detail.id() == Dimension::Id::X)
                m_x = *(const double *)value;
-            else if (id == Dimension::Id::Y)
+            else if (detail.id() == Dimension::Id::Y)
                m_y = *(const double *)value;
-            else if (id == Dimension::Id::Z)
+            else if (detail.id() == Dimension::Id::Z)
                m_z = *(const double *)value;
         }
-        void getFieldInternal(Dimension::Id id, PointId idx,
-            void *value) const
+        void getFieldInternal(const Dimension::Detail& detail, PointId idx,
+            void *value) const override
         {
-            if (id == Dimension::Id::X)
+            if (detail.id() == Dimension::Id::X)
                *(double *)value = m_x;
-            else if (id == Dimension::Id::Y)
+            else if (detail.id() == Dimension::Id::Y)
                *(double *)value = m_y;
-            else if (id == Dimension::Id::Z)
+            else if (detail.id() == Dimension::Id::Z)
                *(double *)value = m_z;
         }
     };

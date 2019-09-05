@@ -47,9 +47,9 @@ class PDAL_DLL PointContainer
     friend class PointView;
     friend class PointRef;
 private:
-    virtual void setFieldInternal(Dimension::Id dim, PointId idx,
+    virtual void setFieldInternal(const Dimension::Detail& detail, PointId idx,
         const void *val) = 0;
-    virtual void getFieldInternal(Dimension::Id dim, PointId idx,
+    virtual void getFieldInternal(const Dimension::Detail& detail, PointId idx,
         void *val) const = 0;
 public:
     virtual PointLayoutPtr layout() const = 0;

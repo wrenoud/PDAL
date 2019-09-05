@@ -78,26 +78,21 @@ ArtifactManager& BasePointTable::artifactManager()
     return *m_artifactManager;
 }
 
-
-void SimplePointTable::setFieldInternal(Dimension::Id id, PointId idx,
-    const void *value)
+void SimplePointTable::setFieldInternal(const Dimension::Detail& detail, PointId idx,
+                                        const void* value)
 {
-    const Dimension::Detail *d = m_layoutRef.dimDetail(id);
-    const char *src  = (const char *)value;
-    char *dst = getDimension(d, idx);
-    std::copy(src, src + d->size(), dst);
+    const char* src = (const char*)value;
+    char* dst = getDimension(detail, idx);
+    std::copy(src, src + detail.size(), dst);
 }
 
-
-void SimplePointTable::getFieldInternal(Dimension::Id id, PointId idx,
-    void *value) const
+void SimplePointTable::getFieldInternal(const Dimension::Detail& detail, PointId idx,
+                                        void* value) const
 {
-    const Dimension::Detail *d = m_layoutRef.dimDetail(id);
-    const char *src = getDimension(d, idx);
-    char *dst = (char *)value;
-    std::copy(src, src + d->size(), dst);
+    const char* src = getDimension(detail, idx);
+    char* dst = (char*)value;
+    std::copy(src, src + detail.size(), dst);
 }
-
 
 PointTable::~PointTable()
 {
